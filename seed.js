@@ -23,7 +23,6 @@ const seed = async () => {
         slug: agencyData.slug,
         children: agencyData.children,
         cfrReferences: agencyData.cfr_references,
-        wordCount: 0,
         regulationCount: 0,
         checksum: null,
         lastUpdated: null,

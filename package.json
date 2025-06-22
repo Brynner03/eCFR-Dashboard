@@ -13,10 +13,14 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.10.0",
+    "cheerio": "^1.1.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^5.1.0",
     "path": "^0.12.7",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.34"
   }
 }
