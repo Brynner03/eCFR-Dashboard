@@ -1,5 +1,6 @@
 const { db } = require("./db");
 const Agency = require("./models/Agency");
+const checksumGenerator = require("./utils/checkSumGenerator")
 
 const seed = async () => {
   await db.sync({ force: true });
@@ -15,6 +16,7 @@ const seed = async () => {
     // Fetch and create Agencies
 
     for (const agencyData of agencies) {
+      const checksum = checksumGenerator(agencyData)
       await Agency.create({
         name: agencyData.name,
         shortName: agencyData.short_name,
@@ -24,7 +26,7 @@ const seed = async () => {
         children: agencyData.children,
         cfrReferences: agencyData.cfr_references,
         regulationCount: 0,
-        checksum: null,
+        checkSum: checksum,
         lastUpdated: null,
         latestChange: null,
         hasRecentChange: false,
