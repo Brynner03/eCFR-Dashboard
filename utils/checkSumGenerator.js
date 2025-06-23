@@ -7,7 +7,7 @@ function checksumGenerator(agencyData) {
         sortable_name: agencyData.sortable_name,
         slug: agencyData.slug,
         children: agencyData.children,
-        cfr_references: agencyData.cfr_references,
+        cfr_references: agencyData.cfrReferences,
     })
 
     return crypto.createHash("sha256").update(baseString).digest("hex")

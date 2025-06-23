@@ -43,22 +43,18 @@ const Agency = db.define("Agency", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  regulationCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
   lastUpdated: {
     type: DataTypes.DATE,
-    allowNull: true,
-  },
-  latestChange: {
-    type: DataTypes.FLOAT,
     allowNull: true,
   },
   hasRecentChange: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  totalChanges: {
+  type: DataTypes.INTEGER,
+  defaultValue: 1,
+},
 });
 
 module.exports = Agency;
