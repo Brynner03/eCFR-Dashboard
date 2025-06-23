@@ -1,7 +1,7 @@
 const { db } = require("./db");
 const Agency = require("./models/Agency");
-const AgencyHistory = require("./models/AgencyHistory");
 const checksumGenerator = require("./utils/checkSumGenerator");
+const { trackAndUpdateAgencyChanges } = require("./controllers/AgencyHistoryController");
 
 const seed = async () => {
   await db.sync({ force: true });
@@ -15,53 +15,30 @@ const seed = async () => {
     const agencies = data.agencies;
 
     for (const agencyData of agencies) {
-      const newChecksum = checksumGenerator(agencyData);
-      const existing = await Agency.findOne({ where: { slug: agencyData.slug } });
+      const formatted = {
+        name: agencyData.name,
+        shortName: agencyData.short_name,
+        displayName: agencyData.display_name,
+        sortableName: agencyData.sortable_name,
+        slug: agencyData.slug,
+        children: agencyData.children,
+        cfrReferences: agencyData.cfr_references,
+      };
 
-      let hasRecentChange = false;
-      let lastUpdated = null;
-      let totalChanges = 0;
+      const existing = await Agency.findOne({ where: { slug: formatted.slug } });
 
       if (existing) {
-        if (existing.checkSum !== newChecksum) {
-          console.log("🔁 Change detected for", agencyData.slug);
-          hasRecentChange = true;
-          lastUpdated = new Date();
-          totalChanges = existing.totalChanges + 1;
+        const changed = await trackAndUpdateAgencyChanges(existing, formatted);
 
-          await AgencyHistory.create({
-            agencySlug: agencyData.slug,
-            previousChecksum: existing.checkSum,
-            newChecksum: newChecksum,
-            changedAt: lastUpdated,
-          });
-
-          await existing.update({
-            name: agencyData.name,
-            shortName: agencyData.short_name,
-            displayName: agencyData.display_name,
-            sortableName: agencyData.sortable_name,
-            children: agencyData.children,
-            cfrReferences: agencyData.cfr_references,
-            checkSum: newChecksum,
-            hasRecentChange,
-            lastUpdated,
-            totalChanges,
-          });
-        } else {
-          console.log("✅ No change for", agencyData.slug);
-        }
+        console.log(
+          changed
+            ? `Change detected and tracked for ${formatted.slug}`
+            : `No change for ${formatted.slug}`
+        );
       } else {
-        // New record
         await Agency.create({
-          name: agencyData.name,
-          shortName: agencyData.short_name,
-          displayName: agencyData.display_name,
-          sortableName: agencyData.sortable_name,
-          slug: agencyData.slug,
-          children: agencyData.children,
-          cfrReferences: agencyData.cfr_references,
-          checkSum: newChecksum,
+          ...formatted,
+          checkSum: checksumGenerator(formatted),
           wordCount: 0,
           regulationCount: 0,
           lastUpdated: new Date(),
@@ -70,11 +47,11 @@ const seed = async () => {
           totalChanges: 0,
         });
 
-        console.log("🆕 New agency added:", agencyData.slug);
+        console.log("New agency added:", formatted.slug);
       }
     }
 
-    console.log("✅ Agency data synced successfully.");
+    console.log("Agency data synced successfully.");
   } catch (error) {
     console.error("Seeding error:", error);
   } finally {
