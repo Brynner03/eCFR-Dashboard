@@ -1,7 +1,9 @@
 const { db } = require("./db");
 const Agency = require("./models/Agency");
 const checksumGenerator = require("./utils/checkSumGenerator");
-const { trackAndUpdateAgencyChanges } = require("./controllers/AgencyHistoryController");
+const {
+  trackAndUpdateAgencyChanges,
+} = require("./controllers/AgencyHistoryController");
 
 const seed = async () => {
   await db.sync({ force: true });
@@ -25,7 +27,9 @@ const seed = async () => {
         cfrReferences: agencyData.cfr_references,
       };
 
-      const existing = await Agency.findOne({ where: { slug: formatted.slug } });
+      const existing = await Agency.findOne({
+        where: { slug: formatted.slug },
+      });
 
       if (existing) {
         const changed = await trackAndUpdateAgencyChanges(existing, formatted);
@@ -55,7 +59,6 @@ const seed = async () => {
   } catch (error) {
     console.error("Seeding error:", error);
   } finally {
-    await db.close();
     console.log("Database connection closed.");
   }
 };

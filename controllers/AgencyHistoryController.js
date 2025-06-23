@@ -1,8 +1,23 @@
 const AgencyHistory = require("../models/AgencyHistory");
 const checksumGenerator = require("../utils/checkSumGenerator");
 
-async function trackAndUpdateAgencyChanges(agency, updatedData) {
+async function getAgencyHistoryBySlug(req, res) {
+  const { slug } = req.params;
 
+  try {
+    const history = await AgencyHistory.findAll({
+      where: { agencySlug: slug },
+      order: [["timestamp", "DESC"]],
+    });
+
+    res.json(history);
+  } catch (error) {
+    console.error(`Error fethcing history for ${slug}: `, error);
+    res.status(500).json({ error: "Internal Server Error " });
+  }
+}
+
+async function trackAndUpdateAgencyChanges(agency, updatedData) {
   const inputForChecksum = {
     display_name: updatedData.displayName,
     sortable_name: updatedData.sortableName,
@@ -41,4 +56,5 @@ async function trackAndUpdateAgencyChanges(agency, updatedData) {
 
 module.exports = {
   trackAndUpdateAgencyChanges,
+  getAgencyHistoryBySlug,
 };

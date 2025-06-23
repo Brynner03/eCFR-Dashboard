@@ -1,5 +1,6 @@
 const xpath = require("xpath");
 const { DOMParser } = require("xmldom");
+const { Agency, AgencyHistory } = require("../models");
 
 async function getWordCount({ title, chapter }) {
   try {
@@ -40,10 +41,43 @@ async function getWordCount({ title, chapter }) {
   }
 }
 
-// TEMP TEST
-if (require.main === module) {
-  (async () => {
-    const count = await getWordCount({ title: 5, chapter: "III" });
-    console.log("Word count:", count);
-  })();
+async function getAllAgencies(req, res) {
+  try {
+    const agencies = await Agency.findAll();
+    res.send(agencies);
+  } catch (error) {
+    console.error("Failed to fetch agencies: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
+
+async function getAgencyHistoryBySlug(req, res) {
+  try {
+    const { slug } = req.params;
+    const agency = await Agency.findOne({
+      where: { slug },
+      include: [
+        {
+          model: AgencyHistory,
+          as: "history",
+          order: [["timestamp", "DESC"]],
+        },
+      ],
+    });
+
+    if (!agency) {
+      return res.status(404).json({ error: "Agency not found" });
+    }
+
+    res.json(agency);
+  } catch (error) {
+    console.error("Error fetching agency: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+module.exports = {
+  getAllAgencies,
+  getWordCount,
+  getAgencyHistoryBySlug,
+};

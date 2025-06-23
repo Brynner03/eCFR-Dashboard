@@ -52,9 +52,9 @@ const Agency = db.define("Agency", {
     defaultValue: false,
   },
   totalChanges: {
-  type: DataTypes.INTEGER,
-  defaultValue: 1,
-},
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+  },
 });
 
 module.exports = Agency;
