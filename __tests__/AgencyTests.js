@@ -1,8 +1,10 @@
-const db = require('../db').db;
-const Agency = require('../models/Agency');
-const AgencyHistory = require('../models/AgencyHistory');
-const checksumGenerator = require('../utils/checkSumGenerator');
-const { trackAndUpdateAgencyChanges } = require('../controllers/AgencyHistoryController');
+const db = require("../db").db;
+const Agency = require("../models/Agency");
+const AgencyHistory = require("../models/AgencyHistory");
+const checksumGenerator = require("../utils/checkSumGenerator");
+const {
+  trackAndUpdateAgencyChanges,
+} = require("../controllers/AgencyHistoryController");
 
 describe("Agency update tracking", () => {
   beforeAll(async () => {
@@ -34,10 +36,10 @@ describe("Agency update tracking", () => {
     const hasChanged = await trackAndUpdateAgencyChanges(updated, agencyData);
 
     const refreshed = await Agency.findOne({ where: { slug: "test-agency" } });
-    console.log(initialChecksum)
 
-    console.log(refreshed.checkSum)
-    const history = await AgencyHistory.findAll({ where: { agencySlug: "test-agency" } });
+    const history = await AgencyHistory.findAll({
+      where: { agencySlug: "test-agency" },
+    });
 
     expect(hasChanged).toBe(true);
     expect(refreshed.hasRecentChange).toBe(true);
